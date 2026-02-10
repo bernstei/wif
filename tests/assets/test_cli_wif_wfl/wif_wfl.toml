@@ -1,0 +1,34 @@
+[fit_md]
+
+    num_inputs_per_python_subprocess = 1
+    num_python_subprocesses = 2
+
+    [fit_md.remote_info]
+        sys_name = "tin"
+        job_name = "wif_pytest_md"
+        pre_cmds = ["module purge; module load compiler/gnu lapack/mkl python/conda python_extras/basics python_extras/torch/cpu; module list"]
+        # pre_cmds = ["module unload cuda python_extra/torch/cpu python_extras/torch/gpu; module load cuda python_extras/torch/cpu"]
+        resources = {num_cores = 16, max_time = "1h", partitions = "n2013,n2016"}
+
+[dft_eval]
+
+    [dft_eval.remote_info]
+
+        sys_name = "tin"
+        job_name = "wif_pytest_dft_eval"
+        num_inputs_per_queued_job = 2
+        input_files = ["input_files/POTCARs"]
+        pre_cmds = [ "module unload dft/vasp; module load dft/vasp/6.4.3" ]
+        resources = {num_cores = 16, max_time = "1h", partitions = "n2013,n2016"}
+
+# [dft_isolated_atoms]
+
+[fit]
+
+    [fit.remote_info]
+
+        sys_name = "tin"
+        job_name = "wif_pytest_fit"
+        pre_cmds = ["module purge; module load compiler/gnu lapack/mkl python/conda python_extras/basics cuda python_extras/torch/gpu; module list"]
+        # pre_cmds = ["module list; module unload cuda python_extra/torch/cpu python_extras/torch/gpu; module load cuda python_extras/torch/gpu; module list"]
+        resources = {num_nodes = 1, max_time = "1h", partitions = "gpu_1"}

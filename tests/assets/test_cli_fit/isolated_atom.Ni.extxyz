@@ -1,0 +1,3 @@
+1
+Lattice="7.0 0.0 0.0 0.0 7.1 0.0 0.0 0.0 7.2" Properties=species:S:1:pos:R:3:REF_forces:R:3 config_type=IsolatedAtom _ConfigSet_loc=" / 0" vasp_rundir=md_step_00.step_010.VASP_runs/run_VASP_o1stdqb4 REF_energy=-0.23577833 REF_stress="0.008287701591457402 0.007909371916607112 0.008018795632896555 -0.0 -0.0 -0.0" REF_converged=T pbc="T T T"
+Ni       0.00000000       0.00000000       0.00000000      -0.00000000      -0.00000000      -0.00000000

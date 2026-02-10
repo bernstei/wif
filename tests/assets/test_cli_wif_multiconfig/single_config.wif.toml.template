@@ -1,0 +1,23 @@
+[data]
+
+n_configs_per_fit = 16
+config_interval = 5
+
+[fit]
+
+prev_run_dirs = [ "_INPUTS_DIR_/prev_run" ]
+validation_fraction = 0.5
+
+[fit.isolated_atoms]
+
+    box_size = 7.0
+
+[potential.fit.mace.command_line_args]
+
+max_num_epochs = 2
+num_samples_pt = 10
+
+batch_size = 2
+valid_batch_size = 2
+
+device = "cpu"

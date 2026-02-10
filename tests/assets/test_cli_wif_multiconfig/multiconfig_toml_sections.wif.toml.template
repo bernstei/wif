@@ -1,0 +1,52 @@
+[main]
+
+input_configs = "*.POSCAR"
+
+[data]
+
+# too low, to test automatic increase to satisfy stratification minima
+n_configs_per_fit = 1
+config_interval = 5
+
+[fit]
+
+prev_run_dirs = [ "_INPUTS_DIR_/prev_run" ]
+validation_fraction = 0.5
+
+[fit.isolated_atoms]
+
+box_size = 7.0
+
+[potential.fit.mace.command_line_args]
+
+max_num_epochs = 2
+num_samples_pt = 10
+
+batch_size = 2
+valid_batch_size = 2
+
+device = "cpu"
+
+[md]
+
+n_steps = 10
+
+[md.per_config.0]
+    T = 500
+    T_end = "_NONE_"
+    P = 1.0
+
+[md.per_config.1]
+    T = 100
+    T_end = 110
+    P = 1.0
+
+[md.per_config.2]
+    T = 500
+    T_end = "_NONE_"
+    P = 2.0
+
+[md.per_config.3]
+    T = 100
+    T_end = 110
+    P = "_NONE_"

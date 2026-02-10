@@ -1,0 +1,11 @@
+__pycache__
+.pyc
+wflif.*.log
+._.DS_Store
+.DS_Store
+logs
+build
+*.egg-info
+pytest_wif
+POTCAR*VASP
+wif*.log

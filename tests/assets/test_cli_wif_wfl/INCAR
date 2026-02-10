@@ -1,0 +1,17 @@
+IBRION = 0
+POTIM = 1.5
+NSW = 50
+
+ISIF = 8
+
+TEBEG = 300
+# TEEND = 500
+SMASS = 0
+
+KSPACING = 1000
+
+ENCUT = 400
+
+# overridden by wif.toml
+WIF_N_CONFIGS_PER_FIT = 4
+WIF_CONFIG_INTERVAL = 2

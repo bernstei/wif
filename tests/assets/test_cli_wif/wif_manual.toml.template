@@ -1,0 +1,38 @@
+[main]
+
+manual_dft = true
+output_prefix = "manual"
+
+[md]
+
+dt = 1.1
+n_steps = 36
+traj_config_interval = 2
+
+[data]
+
+n_configs_per_fit = 4
+config_interval = 6
+
+[fit]
+
+prev_fitting_configs = [ "_INPUTS_DIR_/prev_configs.xyz" ]
+validation_fraction = 0.5
+
+[fit.isolated_atoms]
+
+box_size = 7.0
+
+[potential]
+
+kwargs = {symmetrix = true, species = ["Ni"]}
+
+[potential.fit.mace.command_line_args]
+
+max_num_epochs = 2
+num_samples_pt = 10
+
+batch_size = 2
+valid_batch_size = 2
+
+device = "cpu"

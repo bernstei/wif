@@ -1,0 +1,46 @@
+image: python:3.11
+# image: spork.nre.navy.mil/bernstei_nre/containers/mace
+
+tests:
+  stage: build
+  tags:
+    - fusion-runner-nre-spork-nrl-code-6393-docker
+  script:
+    # install various prereqs
+    - python3 -m pip install git+https://gitlab.com/ase/ase.git # "ase<3.26"
+    - python3 -m pip install pytest ruff
+    - python3 -m pip install toml scikit-learn
+    - python3 -m pip install matscipy
+    - python3 -m pip install git+https://github.com/libAtoms/workflow
+    - python3 -m pip install torch==2.7.1+cpu --index-url https://download.pytorch.org/whl/cpu
+    - python3 -m pip install git+https://github.com/ACEsuit/mace@develop
+    # build and install symmetrix
+    - apt-get update
+    - apt-get install -y --no-install-recommends libblas-dev liblapack-dev cmake git
+    - cmake --version
+    - g++ --version
+    - which python3
+    - python3 --version
+    - python3 -m venv venv
+    - source venv/bin/activate
+    - python3 -m pip install ase cmake-build-extension[all] numpy pytest setuptools scipy wheel
+    - mkdir $HOME/symmetrix
+    - pushd $HOME/symmetrix
+    -   git clone --recursive https://github.com/wcwitt/symmetrix.git
+    -   cd symmetrix/symmetrix
+    -   python3 -m pip wheel .
+    -   deactivate
+    -   ls -l *whl
+    -   python3 -m pip install symmetrix*whl
+    - popd
+    - python3 -c "import symmetrix; print(symmetrix.__file__)"
+    # do tests
+    - ruff check wif
+    - mkdir -p ~/.cache/mace
+    - cp tests/assets/cache_mace/descriptorsnpy ~/.cache/mace
+    - gzip -cd tests/assets/cache_mace/mp_traj_combinedxyz.gz > ~/.cache/mace/mp_traj_combinedxyz
+    - pytest --durations=0 # --run_expyre requires expyre, slurm, etc
+    - python3 -m pip install .
+  retry:
+    max: 2
+    when: runner_system_failure

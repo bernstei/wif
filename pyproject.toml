@@ -1,0 +1,22 @@
+[project]
+
+name = "wif"
+requires-python = ">=3.11"
+dependencies = [ "wfl", "toml", "scikit-learn" ]
+readme = "README.md"
+license = { file = "LICENSE" }
+dynamic = ["version"]
+
+[project.scripts]
+    wif = "wif.cli.wif:main"
+    wif_fit = "wif.cli.fit:main"
+    wif_md = "wif.cli.md:main"
+
+[tool.setuptools.packages.find]
+    exclude = [ "tests*", "build*" ]
+
+[tool.setuptools.dynamic]
+version = {attr  = "wif.__version__"}
+
+[tool.setuptools.package-data]
+    wif = ["wif_defaults.toml", "wif_wfl_defaults.toml"]

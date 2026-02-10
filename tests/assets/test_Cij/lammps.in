@@ -1,0 +1,56 @@
+units metal
+atom_style atomic
+atom_modify map yes 
+
+read_data Al_108.data
+
+mass 1 26.98
+
+####################################################################################################
+# r0 = 2.04 * sqrt(2) = 2.88499566724111389955
+# rcut = 2.7 * r0 = 2.885 * 2.7 = 7.7895
+
+pair_style    morse/smooth/linear 7.7895
+pair_coeff    * * 0.07 6.0 2.885 7.7895
+####################################################################################################
+
+timestep 0.0025
+
+fix RELAX all box/relax iso 0.0
+minimize 0.001 0.001 100 100
+unfix RELAX
+
+variable TT equal "v_T * 2"
+velocity all create ${TT} 5
+
+variable nsteps_half equal "v_nsteps / 2"
+
+thermo 50000
+
+variable tdamp equal 0.2
+variable pdamp equal 10.0
+
+fix NPT all npt temp ${T} ${T} ${tdamp} tri 0 0 ${pdamp}
+
+dump TRAJ all custom 1 traj.${T}.NPT.propag.dump id type mass x y z vx vy vz
+run 1000
+undump TRAJ
+run ${nsteps_half}
+dump TRAJ all custom 100 traj.${T}.NPT.dump id type mass x y z vx vy vz
+run ${nsteps_half}
+
+## # clear dump and fix
+## undump TRAJ
+## unfix NPT
+## 
+## fix NVT all nvt temp                                    ${T} ${T} ${tdamp}
+## # fix NVE all nve
+## # fix LANG all langevin                                 ${T} ${T} ${tdamp}
+## fix PRESS_LANG all press/langevin tri 0 0 ${pdamp} temp ${T} ${T}          200
+## 
+## dump TRAJ all custom 1 traj.${T}.NVT_PRESS_LANG.propag.dump id type mass x y z vx vy vz
+## run 1000
+## undump TRAJ
+## run ${nsteps_half}
+## dump TRAJ all custom 100 traj.${T}.NVT_PRESS_LANG.dump id type mass x y z vx vy vz
+## run ${nsteps_half}

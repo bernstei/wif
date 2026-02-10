@@ -1,0 +1,95 @@
+#!/usr/bin/env python3
+
+from argparse import ArgumentParser
+parser = ArgumentParser()
+parser.add_argument("--calculator", "-c", choices=["EMT", "MACE_small"], default="EMT")
+args = parser.parse_args()
+
+import xml.etree.ElementTree as ET
+
+import ase.io
+import ase.units
+
+if args.calculator == "EMT":
+    from ase.calculators.emt import EMT
+    calc = EMT()
+elif args.calculator == "MACE_small":
+    from mace.calculators.foundations_models import mace_mp
+    calc = mace_mp("small", device="cpu")
+else:
+    assert False, "Unknown calculator " + args.calculator
+
+at = ase.io.read("POSCAR")
+at.calc = calc
+
+E = at.get_potential_energy()
+forces = at.get_forces()
+stress = -at.get_stress(voigt=False) / (ase.units.GPa * 0.1)
+# magmom = at.get_magnetic_moment()
+# magmoms = at.get_magnetic_moments()
+magmom = 0.0
+magmoms = [0.0] * len(at)
+
+root = ET.Element("modeling")
+
+el_atominfo = ET.SubElement(root, "atominfo")
+el_atoms = ET.SubElement(el_atominfo, "array", name="atoms")
+el_atoms_s = ET.SubElement(el_atoms, "set")
+last_symb = None
+cur_type = 0
+for symb in at.symbols:
+    if symb != last_symb:
+        cur_type += 1
+    last_symb = symb
+    el_a = ET.SubElement(el_atoms_s, "rc")
+    ET.SubElement(el_a, "c").text = symb
+    ET.SubElement(el_a, "c").text = f"{cur_type}"
+
+el_kpoints = ET.SubElement(root, "kpoints")
+el_kptlist = ET.SubElement(el_kpoints, "varray", name="kpointlist")
+ET.SubElement(el_kptlist, "v").text = "0.0 0.0 0.0"
+
+el_calc = ET.SubElement(root, "calculation")
+
+el_struct = ET.SubElement(el_calc, "structure", name="initialpos")
+el_xtal = ET.SubElement(el_struct, "crystal")
+el_basis = ET.SubElement(el_xtal, "varray", name="basis")
+for a in at.cell:
+    ET.SubElement(el_basis, "v").text = f"{a[0]} {a[1]} {a[2]}"
+el_pos = ET.SubElement(el_struct, "varray", name="positions")
+for r in at.positions:
+    ET.SubElement(el_pos, "v").text = f"{r[0]} {r[1]} {r[2]}"
+
+el_sclast = ET.SubElement(el_calc, "scstep")
+el_sclast_energy = ET.SubElement(el_sclast, "energy")
+ET.SubElement(el_sclast_energy, "i", name="e_fr_energy").text = f"{E}"
+ET.SubElement(el_sclast_energy, "i", name="e_wo_energy").text = f"{E}"
+ET.SubElement(el_sclast_energy, "i", name="e_0_energy").text = f"{E}"
+
+el_forces = ET.SubElement(el_calc, "varray", name="forces")
+for f in forces:
+    ET.SubElement(el_forces, "v").text = f"{f[0]} {f[1]} {f[2]}"
+
+el_stress = ET.SubElement(el_calc, "varray", name="stress")
+ET.SubElement(el_stress, "v").text = f"{stress[0,0]} {stress[0,1]} {stress[0,2]}"
+ET.SubElement(el_stress, "v").text = f"{stress[1,0]} {stress[1,1]} {stress[1,2]}"
+ET.SubElement(el_stress, "v").text = f"{stress[2,0]} {stress[2,1]} {stress[2,2]}"
+
+el_energy = ET.SubElement(el_calc, "energy")
+ET.SubElement(el_energy, "i", name="e_fr_energy").text = f"{E}"
+ET.SubElement(el_energy, "i", name="e_wo_energy").text = f"{E}"
+ET.SubElement(el_energy, "i", name="e_0_energy").text = f"{E}"
+
+tree = ET.ElementTree(root)
+ET.indent(tree, space="  ")
+tree.write("vasprun.xml")
+
+with open("OUTCAR", "w") as fout:
+    fout.write(" number of electron      1.0 magnetization      0.0\n")
+    fout.write("  magnetization (x)\n")
+    fout.write("\n")
+    fout.write("# of ion       s       p       d       tot\n")
+    fout.write("------------------------------------------\n")
+    for i in range(len(at)):
+        fout.write(f"    {i+1}        0.000   0.000   {i * 0.1}   {i * 0.1}\n")
+    fout.write("------------------------------------------\n")

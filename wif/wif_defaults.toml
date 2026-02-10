@@ -1,0 +1,91 @@
+[main]
+
+    input_configs = "_NONE_"
+    output_dir = "."
+    output_prefix = ""
+
+    manual_dft = false
+
+[potential]
+
+    type = "mace"
+    kwargs = { _new_keys_ok = true, device = "_AUTO_CUDA_" }
+
+    [potential.fit.mace]
+
+        isolated_atom_mark = { config_type = "IsolatedAtom" }
+        wfl_fit_kwargs = { _new_keys_ok = true }
+
+    [potential.fit.mace.command_line_args]
+
+        _new_keys_ok = true
+
+        foundation_model = "medium-omat-0"
+        pt_train_file = "mp"
+        pseudolabel_replay = "true"
+
+        atomic_numbers = "AUTO"
+
+        lr = 0.001
+        ema = "_NONE_"
+        ema_decay = 0.995
+
+        energy_weight = 1.0
+        forces_weight = 1.0
+        stress_weight = 1.0
+        max_num_epochs = 150
+        scheduler_patience = 5
+        patience = 40
+        clip_grad = 100.0
+        device = "cuda"
+        save_cpu = "_NONE_"
+
+        num_samples_pt = 30000
+        filter_type_pt = "combinations"
+        subselect_pt = "random"
+
+[md]
+
+    dt = 1.0
+    n_steps = 1000
+    T_tau = 40
+    P_tau = 400
+    P_mass = "_NONE_"
+    P_mass_factor = 1.0
+    var_cell_hydrostatic = true
+    integrator = "Berendsen"
+
+    traj_config_interval = 1
+
+    logger_interval = "_NONE_"
+    initial_model = "_NONE_"
+
+[md.per_config]
+    _new_sections_ok = true
+
+    all_combinations = true
+    apply_to_each_config = true
+
+    T = 300
+    T_end = "_NONE_"
+    P = 0.0
+
+[data]
+
+    n_configs_per_fit = 50
+    config_interval = "_NONE_"
+    fit_interval = "_NONE_"
+    min_fraction_DFT_succeeded = 0.9
+    max_force_warning = 20.0
+
+[fit]
+
+    prev_run_dirs = []
+    prev_fitting_configs = []
+    prev_validation_configs = []
+    prev_isolated_atoms_configs = []
+    validation_fraction = 0.2
+
+    [fit.isolated_atoms]
+        box_size = 15.0
+        force_spin_pol = true

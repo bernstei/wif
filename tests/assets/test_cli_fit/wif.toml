@@ -1,0 +1,26 @@
+[md]
+
+dt = 1.1
+n_steps = 50
+
+[data]
+
+n_configs_per_fit = 4
+config_interval = 5
+
+[fit]
+
+validation_fraction = 0.5
+
+[fit.isolated_atoms]
+
+box_size = 7.0
+
+[potential.fit.mace.command_line_args]
+
+max_num_epochs = 2
+num_samples_pt = 10
+
+batch_size = 2
+valid_batch_size = 2
+device = "cpu"

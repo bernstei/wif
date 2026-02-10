@@ -1,0 +1,6 @@
+fit_md = "_NONE_"
+dft_eval = "_NONE_"
+dft_isolated_atoms = "_NONE_"
+error_calc = "_NONE_"
+[fit]
+    remote_info = "_NONE_"
