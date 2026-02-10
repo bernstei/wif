@@ -1,5 +1,3 @@
-<div align="center"> DRAFT - DO NOT REDISTRIBUTE </div>
-
 # `wif` - *W*FL-based *I*terative *F*itting
 
 Use [wfl](https://github.com/libAtoms/workflow) to fit a machine-learning
@@ -308,6 +306,3 @@ file.  See the [wfl](https://libatoms.github.io/workflow) and
 - check for repeats of a given element in a single POTCAR
 - standalone fit mode
 - report errors from fits
-
-
-<div align="center"> DRAFT - DO NOT REDISTRIBUTE </div>
