@@ -457,17 +457,19 @@ def _calc_interval_and_n_steps(n_traj, n_configs_per_fit, config_interval, fit_i
     if config_interval is None:
         if fit_interval is None:
             raise ValueError("Need at least one of data.config_interval and data.fit_interval")
-        if fit_interval % n_configs_per_traj_per_fit != 0:
-            raise ValueError(f"Got fit_interval {fit_interval} not a multiple of "
-                             f"n_configs_per_traj_per_fit {n_configs_per_traj_per_fit}")
         config_interval = fit_interval // n_configs_per_traj_per_fit
-        logging.warning(f"Set config_interval {config_interval} based on fit_interval {fit_interval} "
-                        f"// n_configs_per_traj_per_fit {n_configs_per_traj_per_fit}")
+
+        msg = (f"Set config_interval {config_interval} based on fit_interval {fit_interval} "
+               f"// n_configs_per_traj_per_fit {n_configs_per_traj_per_fit}.")
+        if config_interval * n_configs_per_traj_per_fit != fit_interval:
+            msg += " THESE ARE NOT DIVISIBLE!"
+        logging.warning(msg)
 
     # set actual fit_interval
     if fit_interval is None:
         fit_interval = config_interval * n_configs_per_traj_per_fit
-        logging.warning(f"Got effective fit_interval {fit_interval}")
+        logging.warning(f"Got effective fit_interval {fit_interval} based on config_interval {config_interval} "
+                        f"* n_configs_per_traj_per_fit {n_configs_per_traj_per_fit}")
 
     # check that config_interval and fit_interval are compatible, e.g. if they were both specified manually
     if config_interval * n_configs_per_traj_per_fit != fit_interval:
