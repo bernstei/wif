@@ -344,7 +344,7 @@ def read_inputs(inputs_dir=Path(), incar_only=False):
     with open(inputs_dir / "INCAR") as fin:
         for incar_line in fin:
             incar_line = incar_line.strip()
-            for int_field in ["n_configs_per_fit", "config_interval", "fit_inteval"]:
+            for int_field in ["n_configs_per_fit", "config_interval", "fit_interval"]:
                 incar_tag = "WIF_" + int_field.upper()
                 if re.search(r"^" + incar_tag + r"\s*=", incar_line):
                     m = re.search(r"^" + incar_tag + r"\s*=\s*([0-9]+)\s*(|;.*|#.*)$", incar_line)
