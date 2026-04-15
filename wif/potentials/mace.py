@@ -181,16 +181,14 @@ def download_cached_data(potential_params):
         atoms.info["REF_energy"] = -1.0
         ase.io.write(fout, atoms, format="extxyz")
 
-    foundation_model_arg = potential_params['fit']['mace']['command_line_args'].get('foundation_model', '')
-    if len(foundation_model_arg) > 0:
-        foundation_model_arg = f"--foundation_model={foundation_model_arg}"
-    foundation_head_arg = potential_params['fit']['mace']['command_line_args'].get('foundation_head', '')
-    if len(foundation_head_arg) > 0:
-        foundation_head_arg = f"--foundation_head={foundation_head_arg}"
+    foundation_model_args = ""
+    for arg_name in ["foundation_model", "foundation_head", "pt_train_file", "multiheads_finetuning"]:
+        arg_val = potential_params['fit']['mace']['command_line_args'].get(arg_name, '')
+        if len(arg_val) > 0:
+            foundation_model_args += f" --{arg_name} {arg_val} "
 
-    cmd = ("mace_run_train --dry_run --name test "
-           f"{foundation_model_arg} {foundation_head_arg} "
-            "--multiheads_finetuning False --batch_size 1 --valid_batch_size 1 "
+    cmd = ("mace_run_train --dry_run --name test " + foundation_model_args +
+            "--batch_size 1 --valid_batch_size 1 " +
             "--train_file t.xyz --valid_file t.xyz").split()
 
     subprocess.run(cmd)
