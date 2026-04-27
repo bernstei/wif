@@ -183,8 +183,8 @@ def download_cached_data(potential_params):
 
     foundation_model_args = ""
     for arg_name in ["foundation_model", "foundation_head", "pt_train_file", "multiheads_finetuning"]:
-        arg_val = potential_params['fit']['mace']['command_line_args'].get(arg_name, '')
-        if len(arg_val) > 0:
+        if arg_name in potential_params['fit']['mace']['command_line_args']:
+            arg_val = potential_params['fit']['mace']['command_line_args'][arg_name]
             foundation_model_args += f" --{arg_name} {arg_val} "
 
     cmd = ("mace_run_train --dry_run --name test " + foundation_model_args +
