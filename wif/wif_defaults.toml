@@ -26,9 +26,9 @@
 
         atomic_numbers = "AUTO"
 
-        lr = 0.001
         ema = "_NONE_"
-        ema_decay = 0.995
+        ema_decay = 0.999
+        weight_decay = 0.0
 
         energy_weight = 1.0
         forces_weight = 1.0
@@ -36,7 +36,6 @@
         max_num_epochs = 150
         scheduler_patience = 5
         patience = 40
-        clip_grad = 100.0
         device = "cuda"
         save_cpu = "_NONE_"
 
