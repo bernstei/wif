@@ -5,6 +5,7 @@ from pathlib import Path
 from wfl.configset import OutputSpec
 
 from wif.utils import get_pot_mod
+from wif.utils import check_large_forces
 from wif.utils import log_fit_errors
 
 def standalone_fit(potential_label, fit_configs, valid_configs, isolated_atoms,
@@ -77,6 +78,11 @@ def standalone_fit(potential_label, fit_configs, valid_configs, isolated_atoms,
             os.store(at)
         os.close()
     isolated_atoms_unique = os.to_ConfigSet()
+
+    os = OutputSpec(output_dir / (output_prefix + "fitting.filtered.extxyz"))
+    fit_configs = check_large_forces(fit_configs, fit_params['max_force_filter'], os)
+    os = OutputSpec(output_dir / (output_prefix + "validation.filtered.extxyz"))
+    valid_configs = check_large_forces(valid_configs, fit_params['max_force_filter'], os)
 
     pot_path = pot_mod.fit(fit_configs + isolated_atoms_unique, valid_configs,
                            fit_command_line_args=potential_params_fit.get('command_line_args', {}),

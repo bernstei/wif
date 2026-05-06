@@ -18,6 +18,7 @@ from ase.atoms import Atoms
 from wfl.configset import ConfigSet, OutputSpec
 from wfl.calculators.generic import calculate
 from wfl.fit.error import calc as error_calc, errors_dumps
+from wfl.select.simple import by_bool_func as select_by_bool_func
 
 from wif.term_symbols import term_symbols
 
@@ -426,3 +427,28 @@ def get_logger_interval(logger_interval, n_steps, default=1):
         raise ValueError(f"Got logger_interval type {type(logger_interval)} not float or int")
 
     return logger_interval
+
+def check_large_forces(configs, max_force, output=None):
+    if output is None:
+        output_use = OutputSpec()
+        do_filter = False
+    else:
+        output_use = output
+        do_filter = True
+    filtered_configs = select_by_bool_func(configs, output_use,
+            lambda atoms: not (not atoms.info.get("REF_calculation_failed", False) and
+                               atoms.info.get("REF_converged", False) and
+                               "REF_forces" in atoms.arrays and
+                               np.max(np.linalg.norm(atoms.arrays["REF_forces"], axis=1)) > max_force))
+
+    len_orig = len(list(configs))
+    len_filtered = len(list(filtered_configs))
+
+    if len_orig != len_filtered:
+        if do_filter:
+            logging.warning(f"Filtered out {len_orig - len_filtered} configurations with forces exceeding {max_force}")
+        else:
+            logging.warning(f"Found {len_orig - len_filtered} configurations with forces exceeding {max_force}")
+
+    if do_filter:
+        return filtered_configs

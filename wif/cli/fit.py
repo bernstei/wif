@@ -33,7 +33,7 @@ def fit(args):
 
     setup_logging(output_dir, output_prefix, "fit", prelim_params_warnings)
 
-    # log all run paramaters
+    # log all run parameters
     log_params("args:", args)
     log_params("potential_params:", potential_params)
     log_params("fit_params:", fit_params)

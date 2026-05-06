@@ -14,7 +14,7 @@ from wfl.generate.md import md
 from wfl.calculators.generic import calculate
 
 from wif.utils import get_pot_mod
-from wif.utils import fraction_REF_success, calc_isolated_atoms
+from wif.utils import check_large_forces, fraction_REF_success, calc_isolated_atoms
 from wif.utils import log_fit_errors, split_cumulative
 from wif.utils import get_logger_interval
 from wif.utils import WIFDebugAbort
@@ -222,13 +222,7 @@ def iterative_md_fit(configs, dft_calc, dft_manual_calc,
         if os.environ.get("WIF_DEBUG_ABORT") == "010": raise WIFDebugAbort # noqa: E701
 
         # check for large forces and enough successful evaluations
-        large_forces = [at_i for at_i, at in enumerate(eval_configs) if
-                        (not at.info.get("REF_calculation_failed", False) and
-                         at.info.get("REF_converged", False) and
-                         "REF_forces" in at.arrays and
-                         np.max(np.linalg.norm(at.arrays["REF_forces"], axis=1) > data_params['max_force_warning']))]
-        if len(large_forces) > 0:
-            logging.warning("Got configurations with forces exceeding {data_params['max_force_warning']} {large_forces}")
+        check_large_forces(eval_configs, data_params['max_force_warning'])
 
         frac = fraction_REF_success(eval_configs)
         if frac < data_params['min_fraction_DFT_succeeded']:
@@ -236,8 +230,13 @@ def iterative_md_fit(configs, dft_calc, dft_manual_calc,
                                f"{frac:.2f} < {data_params['min_fraction_DFT_succeeded']} suceeded "
                                "(REF_energy present and REF_converged True)")
 
+        output = OutputSpec(f"{file_label}.step_015.DFT_filtered.extxyz", file_root=output_dir)
+        filtered_configs = check_large_forces(eval_configs, fit_params['max_force_filter'], output)
+
+        if os.environ.get("WIF_DEBUG_ABORT") == "015": raise WIFDebugAbort # noqa: E701
+
         # separate output_prefix and stage_label needed here so it can find cumulative, i.e. all stages, set of files
-        fit_configs, valid_configs = split_cumulative(eval_configs,
+        fit_configs, valid_configs = split_cumulative(filtered_configs,
                                                       output_dir, output_prefix, f"{stage_label}.step_020",
                                                       fit_params['validation_fraction'], rng)
 

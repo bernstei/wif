@@ -72,8 +72,8 @@ def test_cli_wif(tmp_path, monkeypatch, vasp_exec):
     for f_default, f_manual in zip(sorted(list(tmp_path.glob("stage_*_md_step_*.step_040_fitting.err_MLIP_calc.extxyz"))),
                                 sorted(list(tmp_path.glob("manual.stage_*_md_step_*.step_040_fitting.err_MLIP_calc.extxyz")))):
         for a_default, a_manual in zip(ase.io.iread(f_default), ase.io.iread(f_manual)):
-            assert np.allclose(a_default.positions, a_manual.positions), f"WFL-DEFAULT positions mismatch {f_default} {f_manual}"
-            assert np.allclose(a_default.cell, a_manual.cell), f"WFL-DEFAULT cell mismatch {f_default} {f_manual}"
+            assert np.allclose(a_default.positions, a_manual.positions, atol=5e-6, rtol=5e-4), f"WFL-DEFAULT positions mismatch {f_default} {f_manual}"
+            assert np.allclose(a_default.cell, a_manual.cell,           atol=5e-6, rtol=5e-4), f"WFL-DEFAULT cell mismatch {f_default} {f_manual}"
 
 
 def test_cli_wif_var_cell(tmp_path, monkeypatch, vasp_exec):

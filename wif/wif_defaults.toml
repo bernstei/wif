@@ -85,6 +85,8 @@
     prev_isolated_atoms_configs = []
     validation_fraction = 0.2
 
+    max_force_filter = 20.0
+
     [fit.isolated_atoms]
         box_size = 15.0
         force_spin_pol = true
